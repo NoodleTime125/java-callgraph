@@ -29,6 +29,7 @@
 package gr.gousiosg.javacg.stat;
 
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.Utility;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.ConstantPushInstruction;
 import org.apache.bcel.generic.EmptyVisitor;
@@ -59,8 +60,27 @@ public class MethodVisitor extends EmptyVisitor {
         visitedClass = jc;
         mg = m;
         cp = mg.getConstantPool();
-        format = "M:" + visitedClass.getClassName() + ":" + mg.getName() 
+	String mStr = visitedClass.getClassName() + ":" + mg.getName();
+        String aStr = "";
+        //aStr = getArguments(mg);
+        format = "M:" + mStr + aStr
             + " " + "(%s)%s:%s";
+    }
+
+    public String getArguments(MethodGen mg){
+        String[] arg_types = Utility.methodSignatureArgumentTypes(mg.getSignature(), false);
+        String[] arg_names = mg.getArgumentNames();
+        StringBuilder buf = new StringBuilder("(");
+	for( int i = 0; i < arg_types.length; i++){
+            buf.append(arg_types[i] + " " + arg_names[i]);
+            buf.append(", ");
+        }
+        // Remove last comma and space.
+        if (buf.length() > 1) {
+            buf.setLength(buf.length() - 2);
+        }
+        buf.append(")");
+        return buf.toString();
     }
 
     public void start() {
